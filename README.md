@@ -1,6 +1,12 @@
 # 🏛️ SmartLaw: Production-Grade Legal AI Platform
 
-SmartLaw analyzes legal documents, detects risks, and generates actionable insights—while designed so that sensitive personal data is not exposed to AI models.
+SmartLaw is a secure legal document management and analysis platform that detects risks and generates actionable insights. Designed from the ground up prioritizing privacy, it ensures sensitive personal data is not exposed to third-party AI models.
+
+## ❗ Problem Statement
+Legal professionals handle highly sensitive documents daily (NDAs, contracts, financial records). However, utilizing standard consumer AI tools to process these documents creates massive compliance risks by exposing Personally Identifiable Information (PII) to external, third-party LLM providers.
+
+## 💡 Solution
+SmartLaw introduces a privacy-first pipeline. By integrating a custom PII redaction layer with client-side mapping restoration, it gives professionals the power of advanced AI reasoning (Llama 3.3) *without* compromising client confidentiality.
 
 ## 🌐 Live Deployment
 
@@ -13,23 +19,14 @@ SmartLaw analyzes legal documents, detects risks, and generates actionable insig
 
 ---
 
-## 🎥 Video Demo
-*(Placeholder: 1-2 min Loom / YouTube demo showcasing the end-to-end flow)*
-
----
-
 ## 🧪 Quick Demo Guide
 1. **Register/Login** via the frontend app.
-2. **Upload a sample document** (You can use any standard NDA or employment contract PDF).
+2. **Upload a sample document** (For the best experience, [download our Sample NDA](./sample-docs/) or use any standard corporate contract PDF).
 3. **Click "Analyze"** to process the document.
 4. **Try the features**:
    - **Risk Audit**: Check the clause-level issues.
    - **Summary**: Read the plain-English explanation.
    - **Chat**: Ask specific questions about the document context.
-
----
-
-SmartLaw is a secure legal document management and analysis platform. It leverages state-of-the-art AI (Llama 3.3) to provide deep legal insights while designed to ensure strict privacy through an advanced PII redaction and cloud-storage pipeline.
 
 ---
 
@@ -101,11 +98,11 @@ This architecture is designed to ensure your clients' sensitive information is n
 
 ### Dashboard
 *Dashboard overview displaying active legal documents and their basic metrics.*
-<img src="frontend/src/assets/dashboard.png" alt="Dashboard Screenshot" width="100%"/>
+![Dashboard Screenshot](./frontend/src/assets/dashboard.png)
 
 ### Risk Audit & PII Redaction
 *Risk audit highlighting clause-level issues with a PII redaction preview before AI processing.*
-<img src="frontend/src/assets/analysis.png" alt="Analysis Screenshot" width="100%"/>
+![Analysis Screenshot](./frontend/src/assets/analysis.png)
 
 ---
 
@@ -129,10 +126,29 @@ This architecture is designed to ensure your clients' sensitive information is n
 
 A highly modular REST API powers the platform. Key endpoints include:
 
-- `POST /auth/register` - Create a new secured user account
-- `POST /auth/login` - Authenticate and receive a JWT
-- `POST /documents/upload` - Securely upload and process a legal document
-- `GET /documents/<id>` - Retrieve document analysis and metadata
+- `POST /api/auth/register` - Create a new secured user account
+- `POST /api/auth/login` - Authenticate and receive a JWT
+- `GET /api/documents/<id>` - Retrieve document analysis and metadata
+
+### `POST /api/documents/upload`
+Securely uploads and processes a legal document.
+
+**Request:** `multipart/form-data`
+- `file`: The legal document (PDF, JPG, PNG).
+
+**Sample Response:**
+```json
+{
+  "message": "Document processed and analyzed successfully",
+  "document": {
+    "id": 101,
+    "pii_mapping": {"[PAN_1]": "ABCDE1234F"},
+    "analysis": {
+      "risks": [{ "clause": "Non-compete", "severity": "High" }]
+    }
+  }
+}
+```
 
 ---
 
@@ -196,11 +212,12 @@ To deploy successfully, ensure the following variables are set:
 
 ---
 
-## ⚠️ Known Limitations
-- OCR performance depends on server resources and may be slower on free-tier deployments.
-- Large documents (>10MB) are restricted to ensure system stability.
-- "Cold starts" on Render free tier may introduce initial request latency.
-- **Production Reliability**: Currently lacks an automated CI/CD pipeline, and comprehensive unit/integration tests are still pending.
+## ⚠️ Known Limitations & Testing
+- **Performance Limits**: OCR performance depends on server resources and may be slower on free-tier deployments. Large documents (>10MB) are restricted to ensure system stability. "Cold starts" on Render free tier may introduce initial request latency.
+- **Production Reliability**: Currently lacks an automated CI/CD pipeline. However, **strict manual end-to-end testing has been conducted across core workflows:**
+  - Auth flow (Registration & Login validation)
+  - Document Upload & Storage (Cloudinary integration)
+  - OCR extraction + AI reasoning pipeline
 - **Monitoring**: No centralized error monitoring (e.g., Sentry) or explicit rate-limiting middleware is present in this iteration.
 
 ---
