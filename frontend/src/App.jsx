@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import AuthPage from './pages/AuthPage';
 import Dashboard from './pages/Dashboard';
 import DbExplorer from './pages/DbExplorer';
+import ResetPasswordPage from './pages/ResetPasswordPage';
 import './index.css';
 
 const BASE_URL = import.meta.env.VITE_API_URL;
@@ -13,6 +14,13 @@ export default function App() {
   // ── Show DB Explorer at /db-explorer ───────
   if (window.location.pathname === '/db-explorer') {
     return <DbExplorer />;
+  }
+
+  // ── Show Reset Password Page at /reset-password ──
+  if (window.location.pathname === '/reset-password') {
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get('token');
+    return <ResetPasswordPage token={token} apiBase={BASE_URL} />;
   }
 
   // ── Restore session from localStorage ──────

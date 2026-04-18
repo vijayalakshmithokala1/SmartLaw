@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 
 export default function AuthPage({ onLogin, apiBase }) {
   const [isLogin, setIsLogin] = useState(true);
+  const [isForgot, setIsForgot] = useState(false);
   const [form, setForm] = useState({ name: '', email: '', password: '' });
   const [error, setError] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
@@ -33,6 +34,27 @@ export default function AuthPage({ onLogin, apiBase }) {
     setError('');
     setSuccessMsg('');
     setLoading(true);
+
+    if (isForgot) {
+      try {
+        const res = await fetch(`${apiBase}/auth/forgot-password`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: form.email }),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          setError(data.error || 'Something went wrong.');
+        } else {
+          setSuccessMsg(data.message || 'Check your email for the reset link.');
+        }
+      } catch {
+        setError('Cannot connect to server. Make sure the backend is running.');
+      } finally {
+        setLoading(false);
+      }
+      return;
+    }
 
     const endpoint = isLogin ? '/auth/login' : '/auth/register';
     const body = isLogin
@@ -70,6 +92,7 @@ export default function AuthPage({ onLogin, apiBase }) {
 
   const toggleMode = () => {
     setIsLogin(prev => !prev);
+    setIsForgot(false);
     setError('');
     setSuccessMsg('');
     setForm({ name: '', email: '', password: '' });
@@ -98,22 +121,29 @@ export default function AuthPage({ onLogin, apiBase }) {
         <div className="glass-card" style={{ padding: '2.25rem' }}>
 
           {/* Tab Toggle */}
-          <div className="tab-bar" style={{ marginBottom: '1.75rem' }}>
-            <button
-              className={`tab-btn ${isLogin ? 'active' : ''}`}
-              onClick={() => isLogin || toggleMode()}
-              type="button"
-            >
-              Sign In
-            </button>
-            <button
-              className={`tab-btn ${!isLogin ? 'active' : ''}`}
-              onClick={() => !isLogin || toggleMode()}
-              type="button"
-            >
-              Create Account
-            </button>
-          </div>
+          {!isForgot ? (
+            <div className="tab-bar" style={{ marginBottom: '1.75rem' }}>
+              <button
+                className={`tab-btn ${isLogin ? 'active' : ''}`}
+                onClick={() => isLogin || toggleMode()}
+                type="button"
+              >
+                Sign In
+              </button>
+              <button
+                className={`tab-btn ${!isLogin ? 'active' : ''}`}
+                onClick={() => !isLogin || toggleMode()}
+                type="button"
+              >
+                Create Account
+              </button>
+            </div>
+          ) : (
+            <div style={{ marginBottom: '1.75rem', textAlign: 'center' }}>
+              <h2 style={{ fontSize: '1.25rem', color: 'var(--text-main)', margin: '0 0 0.5rem 0' }}>Reset Password</h2>
+              <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Enter your email to receive a reset link.</p>
+            </div>
+          )}
 
           {/* Success Message */}
           {successMsg && (
@@ -135,7 +165,7 @@ export default function AuthPage({ onLogin, apiBase }) {
           <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
 
             {/* Name field (register only) */}
-            {!isLogin && (
+            {!isLogin && !isForgot && (
               <div className="fade-up">
                 <label style={labelStyle}>Full Name</label>
                 <input
@@ -165,19 +195,32 @@ export default function AuthPage({ onLogin, apiBase }) {
               />
             </div>
 
-            <div>
-              <label style={labelStyle}>Password</label>
-              <input
-                id="auth-password"
-                className="form-input"
-                type="password"
-                placeholder={isLogin ? '••••••••' : 'Min. 8 characters'}
-                value={form.password}
-                onChange={update('password')}
-                required
-                autoComplete={isLogin ? 'current-password' : 'new-password'}
-              />
-            </div>
+            {!isForgot && (
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.4rem' }}>
+                  <label style={{ ...labelStyle, marginBottom: 0 }}>Password</label>
+                  {isLogin && (
+                    <button 
+                      type="button" 
+                      onClick={() => { setIsForgot(true); setError(''); setSuccessMsg(''); }} 
+                      style={{ background: 'none', border: 'none', color: '#C9A84C', fontSize: '0.75rem', cursor: 'pointer', padding: 0 }}
+                    >
+                      Forgot password?
+                    </button>
+                  )}
+                </div>
+                <input
+                  id="auth-password"
+                  className="form-input"
+                  type="password"
+                  placeholder={isLogin ? '••••••••' : 'Min. 8 characters'}
+                  value={form.password}
+                  onChange={update('password')}
+                  required
+                  autoComplete={isLogin ? 'current-password' : 'new-password'}
+                />
+              </div>
+            )}
 
             {/* Error */}
             {error && (
@@ -195,9 +238,19 @@ export default function AuthPage({ onLogin, apiBase }) {
               style={{ padding: '0.85rem', fontSize: '0.9375rem', marginTop: '0.25rem' }}
             >
               {loading
-                ? (isLogin ? 'Signing in…' : 'Creating account…')
-                : (isLogin ? 'Sign In' : 'Create Account')}
+                ? (isForgot ? 'Sending...' : (isLogin ? 'Signing in…' : 'Creating account…'))
+                : (isForgot ? 'Send Reset Link' : (isLogin ? 'Sign In' : 'Create Account'))}
             </button>
+
+            {isForgot && (
+              <button
+                type="button"
+                onClick={() => { setIsForgot(false); setError(''); setSuccessMsg(''); }}
+                style={{ background: 'none', border: 'none', color: 'var(--text-muted)', fontSize: '0.85rem', cursor: 'pointer', marginTop: '0.5rem' }}
+              >
+                ← Back to Sign In
+              </button>
+            )}
           </form>
 
           {/* Privacy notice */}
