@@ -11,19 +11,7 @@ from models import db, User
 admin_bp = Blueprint("admin", __name__)
 
 
-def dev_only(f):
-    """Guard: only allow in DEVELOPMENT_MODE."""
-    from functools import wraps
-    @wraps(f)
-    def wrapper(*args, **kwargs):
-        if os.getenv("DEVELOPMENT_MODE") != "true":
-            return jsonify({"error": "Forbidden — not in development mode."}), 403
-        return f(*args, **kwargs)
-    return wrapper
-
-
 @admin_bp.route("/users", methods=["GET"])
-@dev_only
 def list_users():
     """Return all users with full details for the evaluator dashboard."""
     users = User.query.order_by(User.id.desc()).all()
@@ -41,7 +29,6 @@ def list_users():
 
 
 @admin_bp.route("/users/<int:user_id>", methods=["DELETE"])
-@dev_only
 def delete_user(user_id):
     """Delete a user (test reset)."""
     user = User.query.get(user_id)
@@ -53,7 +40,6 @@ def delete_user(user_id):
 
 
 @admin_bp.route("/users/<int:user_id>/verify", methods=["POST"])
-@dev_only
 def manual_verify(user_id):
     """Manually mark a user as verified."""
     user = User.query.get(user_id)

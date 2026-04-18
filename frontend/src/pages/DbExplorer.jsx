@@ -201,7 +201,7 @@ export default function DbExplorer() {
           ) : error ? (
             <div style={{ padding: '3rem', textAlign: 'center', color: 'var(--danger)' }}>
               <div style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>❌</div>
-              {error} — ensure DEVELOPMENT_MODE=true in backend .env
+              {error}
             </div>
           ) : users.length === 0 ? (
             <div style={{ padding: '4rem', textAlign: 'center' }}>
