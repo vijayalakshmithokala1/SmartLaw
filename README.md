@@ -6,9 +6,7 @@ Existing AI tools can expose this data to external models, creating serious priv
 
 
 ## 💡 Solution
-SmartLaw introduces a privacy-first AI pipeline that redacts sensitive information before inference and restores it securely on the client side.
-
-SmartLaw analyzes legal documents, detects risks, and generates actionable insights—while designed so that sensitive personal data is not exposed to AI models.
+SmartLaw is a privacy-first legal AI platform that analyzes documents, detects risks, and generates actionable insights—without exposing sensitive personal data to AI models.
 
 ## 🌐 Live Deployment
 
