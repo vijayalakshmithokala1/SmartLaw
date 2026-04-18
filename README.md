@@ -11,12 +11,7 @@ SmartLaw analyzes legal documents, detects risks, and generates actionable insig
 
 > **💡 Presentation Tip:** Bookmark both links or open them in browser tabs before your demo starts. The Render backend may take ~30 seconds to wake up on first load (free tier cold start) — open it a minute early!
 
----
-
-## 🎥 Video Demo
-*(Placeholder: 1-2 min Loom / YouTube demo showcasing the end-to-end flow)*
-
----
+----
 
 ## 🧪 Quick Demo Guide
 1. **Register/Login** via the frontend app.
