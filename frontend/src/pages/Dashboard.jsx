@@ -246,15 +246,6 @@ export default function Dashboard({ user, onLogout, apiBase }) {
       );
     }
 
-    if (activeNav === 'settings') {
-      return (
-        <div style={{ padding: '1rem' }}>
-          <h3 style={{ marginBottom: '1rem' }}>⚙️ Platform Settings</h3>
-          <p>Privacy mode: <strong>Always Enabled</strong></p>
-        </div>
-      );
-    }
-
     // DASHBOARD
     return activeTab === 'summarizer' ? (
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflowY: 'auto' }}>
@@ -287,7 +278,7 @@ export default function Dashboard({ user, onLogout, apiBase }) {
         onNavChange={(nav) => { setActiveNav(nav); setCompareResult(null); setResearchResult(null); setIsSidebarOpen(false); }} 
       />
       <main style={{ flex: 1, display: 'flex', flexDirection: 'column', height: '100vh', overflowY: 'auto' }}>
-        <Navbar user={user} onLogout={onLogout} onSettings={() => setActiveNav('settings')} onMenuClick={() => setIsSidebarOpen(true)} />
+        <Navbar user={user} onLogout={onLogout} onMenuClick={() => setIsSidebarOpen(true)} />
         <div style={{ maxWidth: 900, width: '100%', margin: '0 auto', padding: '2.5rem 1.5rem', flex: 1, display: 'flex', flexDirection: 'column' }}>
           <div className="fade-up" style={{ marginBottom: '1.5rem' }}>
             <h2 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--text-primary)', fontFamily: 'Playfair Display, serif' }}>Welcome back, {user?.name?.split(' ')[0]} 👋</h2>

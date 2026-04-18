@@ -89,14 +89,6 @@ export default function Sidebar({ user, activeNav = 'dashboard', recentDocs = []
           </div>
         )}
 
-        <div 
-          className={`sidebar-link ${activeNav === 'settings' ? 'active' : ''}`}
-          onClick={() => onNavChange && onNavChange('settings')}
-          style={{ marginTop: '0.5rem' }}
-        >
-          <span>⚙️</span> Settings
-        </div>
-
         {user?.isAdmin && (
           <div style={{ marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid var(--border)' }}>
             <p style={{ fontSize: '0.65rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '0.5rem', paddingLeft: '0.75rem' }}>Admin Tools</p>
