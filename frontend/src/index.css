@@ -47,28 +47,28 @@
   --bg-surface:     #FFFFFF;
   --bg-card:        #FFFFFF;
   --bg-card-hover:  #F1F5F9;
-  --bg-input:       #FFFFFF;
+  --bg-input:       #F1F5F9;
 
-  --gold:           #B48A2D;
-  --gold-light:     #C9A84C;
-  --gold-dim:       rgba(180, 138, 45, 0.1);
-  --gold-border:    rgba(180, 138, 45, 0.3);
+  --gold:           #856404;
+  --gold-light:     #9A730B;
+  --gold-dim:       rgba(180, 138, 45, 0.08);
+  --gold-border:    rgba(180, 138, 45, 0.2);
 
-  --blue:           #2563EB;
-  --blue-dim:       rgba(37, 99, 235, 0.1);
-  --blue-border:    rgba(37, 99, 235, 0.2);
+  --blue:           #1E40AF;
+  --blue-dim:       rgba(30, 64, 175, 0.08);
+  --blue-border:    rgba(30, 64, 175, 0.2);
 
-  --text-primary:   #0F172A;
-  --text-secondary: #334155;
+  --text-primary:   #1E293B;
+  --text-secondary: #475569;
   --text-muted:     #64748B;
 
-  --border:         rgba(0, 0, 0, 0.1);
-  --border-hover:   rgba(0, 0, 0, 0.2);
+  --border:         rgba(0, 0, 0, 0.08);
+  --border-hover:   rgba(0, 0, 0, 0.15);
 
-  --shadow-card:    0 4px 20px rgba(0,0,0,0.08);
-  --shadow-glow:    0 0 40px rgba(180, 138, 45, 0.1);
-  --orb-gradient-1: radial-gradient(circle, rgba(180,138,45,0.1) 0%, transparent 70%);
-  --orb-gradient-2: radial-gradient(circle, rgba(37,99,235,0.1) 0%, transparent 70%);
+  --shadow-card:    0 4px 20px rgba(0,0,0,0.06);
+  --shadow-glow:    0 0 40px rgba(180, 138, 45, 0.05);
+  --orb-gradient-1: radial-gradient(circle, rgba(180,138,45,0.08) 0%, transparent 70%);
+  --orb-gradient-2: radial-gradient(circle, rgba(37,99,235,0.08) 0%, transparent 70%);
 }
 
 /* ── Base Reset ───────────────────────────────── */
@@ -629,4 +629,20 @@ code {
 [data-theme='light'] .glass-card {
   background: rgba(255, 255, 255, 0.8);
   border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.result-grid {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .result-grid {
+    grid-template-columns: 1fr;
+  }
+  .sidebar-sticky {
+    position: static !important;
+  }
 }
