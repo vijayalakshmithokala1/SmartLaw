@@ -281,7 +281,9 @@ export default function DocUploader({
                         {result.risk_score && result.risk_score !== "N/A" && (
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.75rem', borderRadius: '8px', background: 'rgba(0,0,0,0.03)', border: '1px solid var(--border)' }}>
                             <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Aggregated Score</span>
-                            <span style={{ fontWeight: 800, fontSize: '1.1rem', color: 'var(--text-primary)' }}>{result.risk_score}/10</span>
+                            <span style={{ fontWeight: 800, fontSize: '1.1rem', color: 'var(--text-primary)' }}>
+                                {result.risk_score.toString().includes('/10') ? result.risk_score : `${result.risk_score}/10`}
+                            </span>
                           </div>
                         )}
                       </div>

@@ -606,16 +606,17 @@ code {
 /* ── Floating Action Button (FAB) ──────────────── */
 .fab-container {
   position: fixed;
-  bottom: 2rem;
-  right: 2rem;
+  bottom: 2.5rem;
+  right: 2.5rem;
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  z-index: 999;
+  z-index: 1000;
 }
 
 .fab-menu {
   pointer-events: auto;
+  filter: drop-shadow(0 12px 40px rgba(0,0,0,0.2));
 }
 
 .fab-trigger {
@@ -627,8 +628,9 @@ code {
 }
 
 [data-theme='light'] .glass-card {
-  background: rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.95);
   border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
 }
 
 .result-grid {
