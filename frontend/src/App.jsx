@@ -9,6 +9,14 @@ const BASE_URL = import.meta.env.VITE_API_URL;
 export default function App() {
   const [user, setUser] = useState(null);       // { name, email, token }
   const [loading, setLoading] = useState(true); // check localStorage on mount
+  const [theme, setTheme] = useState(() => localStorage.getItem('smartlaw_theme') || 'dark');
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('smartlaw_theme', theme);
+  }, [theme]);
+  
+  const toggleTheme = () => setTheme(prev => prev === 'dark' ? 'light' : 'dark');
 
   // ── Show Reset Password Page at /reset-password ──
   if (window.location.pathname === '/reset-password') {
@@ -72,7 +80,7 @@ export default function App() {
     <>
       <div className="bg-orbs"></div>
       {user ? (
-        <Dashboard user={user} onLogout={handleLogout} apiBase={BASE_URL} />
+        <Dashboard user={user} onLogout={handleLogout} apiBase={BASE_URL} theme={theme} toggleTheme={toggleTheme} />
       ) : (
         <AuthPage onLogin={handleLogin} apiBase={BASE_URL} />
       )}

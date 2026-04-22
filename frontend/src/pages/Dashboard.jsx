@@ -4,7 +4,7 @@ import Sidebar from '../components/Sidebar';
 import DocUploader from '../components/DocUploader';
 import ChatBox from '../components/ChatBox';
 
-export default function Dashboard({ user, onLogout, apiBase }) {
+export default function Dashboard({ user, onLogout, apiBase, theme, toggleTheme }) {
   const [activeTab, setActiveTab] = useState('summarizer'); 
   const [activeNav, setActiveNav] = useState('dashboard');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -155,8 +155,16 @@ export default function Dashboard({ user, onLogout, apiBase }) {
       );
     }
 
-    // DASHBOARD
-    return activeTab === 'summarizer' ? (
+    if (activeNav === 'chat') {
+      return (
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', height: '100%' }}>
+          <ChatBox token={user?.token} apiBase={apiBase} redactedContext={redactedDocContext} recentDocs={recentDocs} onSelectContext={(text) => setRedactedDocContext(text)} />
+        </div>
+      );
+    }
+
+    // DASHBOARD (Summarizer)
+    return (
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflowY: 'auto' }}>
         {docResult && uploadStep === 3 && (
             <button className="btn-ghost" style={{ alignSelf: 'flex-end', marginBottom: '1rem', fontSize: '0.8rem' }} onClick={() => handleDownloadPDF(docResult.filename || "Summary", docResult.summary)}>
@@ -166,10 +174,6 @@ export default function Dashboard({ user, onLogout, apiBase }) {
         <div style={redactedDocContext ? {} : { padding: '2rem 0', margin: 'auto', width: '100%' }}>
           <DocUploader token={user?.token} apiBase={apiBase} onSummaryReady={handleDocumentReady} step={uploadStep} setStep={setUploadStep} result={docResult} setResult={setDocResult} error={uploadError} setError={setUploadError} />
         </div>
-      </div>
-    ) : (
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', height: '100%' }}>
-        <ChatBox token={user?.token} apiBase={apiBase} redactedContext={redactedDocContext} recentDocs={recentDocs} onSelectContext={(text) => setRedactedDocContext(text)} />
       </div>
     );
   };
@@ -187,16 +191,13 @@ export default function Dashboard({ user, onLogout, apiBase }) {
         onNavChange={(nav) => { setActiveNav(nav); setIsSidebarOpen(false); }} 
       />
       <main style={{ flex: 1, display: 'flex', flexDirection: 'column', height: '100vh', overflowY: 'auto' }}>
-        <Navbar user={user} onLogout={onLogout} onMenuClick={() => setIsSidebarOpen(true)} />
+        <Navbar user={user} onLogout={onLogout} onMenuClick={() => setIsSidebarOpen(true)} theme={theme} toggleTheme={toggleTheme} />
         <div style={{ maxWidth: 900, width: '100%', margin: '0 auto', padding: '2.5rem 1.5rem', flex: 1, display: 'flex', flexDirection: 'column' }}>
           <div className="fade-up" style={{ marginBottom: '1.5rem' }}>
             <h2 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--text-primary)', fontFamily: 'Playfair Display, serif' }}>Welcome back, {user?.name?.split(' ')[0]} 👋</h2>
           </div>
-          <div className="tab-bar fade-up" style={{ marginBottom: '1.5rem' }}>
-            <button className={`tab-btn ${activeNav === 'dashboard' && activeTab === 'summarizer' ? 'active' : ''}`} onClick={() => { setActiveTab('summarizer'); setActiveNav('dashboard'); }}>📄 Summarizer</button>
-            <button className={`tab-btn ${activeNav === 'dashboard' && activeTab === 'chat' ? 'active' : ''}`} onClick={() => { setActiveTab('chat'); setActiveNav('dashboard'); }}>💬 Legal AI</button>
-          </div>
-          <div className="glass-card fade-up" style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: (activeTab === 'chat' && activeNav === 'dashboard') ? 0 : '1.75rem', overflow: 'hidden' }}>
+          
+          <div className="glass-card fade-up" style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: (activeNav === 'chat') ? 0 : '1.75rem', overflow: 'hidden' }}>
              {renderContent()}
           </div>
         </div>

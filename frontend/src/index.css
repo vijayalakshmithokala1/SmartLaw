@@ -42,6 +42,35 @@
   --orb-gradient-2: radial-gradient(circle, rgba(59,130,246,0.15) 0%, transparent 70%);
 }
 
+[data-theme='light'] {
+  --bg-base:        #F8FAFC;
+  --bg-surface:     #FFFFFF;
+  --bg-card:        #FFFFFF;
+  --bg-card-hover:  #F1F5F9;
+  --bg-input:       #FFFFFF;
+
+  --gold:           #B48A2D;
+  --gold-light:     #C9A84C;
+  --gold-dim:       rgba(180, 138, 45, 0.1);
+  --gold-border:    rgba(180, 138, 45, 0.3);
+
+  --blue:           #2563EB;
+  --blue-dim:       rgba(37, 99, 235, 0.1);
+  --blue-border:    rgba(37, 99, 235, 0.2);
+
+  --text-primary:   #0F172A;
+  --text-secondary: #334155;
+  --text-muted:     #64748B;
+
+  --border:         rgba(0, 0, 0, 0.1);
+  --border-hover:   rgba(0, 0, 0, 0.2);
+
+  --shadow-card:    0 4px 20px rgba(0,0,0,0.08);
+  --shadow-glow:    0 0 40px rgba(180, 138, 45, 0.1);
+  --orb-gradient-1: radial-gradient(circle, rgba(180,138,45,0.1) 0%, transparent 70%);
+  --orb-gradient-2: radial-gradient(circle, rgba(37,99,235,0.1) 0%, transparent 70%);
+}
+
 /* ── Base Reset ───────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -572,4 +601,32 @@ code {
 
 @media (min-width: 769px) {
   .mobile-menu-btn { display: none !important; }
+}
+
+/* ── Floating Action Button (FAB) ──────────────── */
+.fab-container {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  z-index: 999;
+}
+
+.fab-menu {
+  pointer-events: auto;
+}
+
+.fab-trigger {
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.fab-trigger:hover {
+  transform: scale(1.1) rotate(5deg);
+}
+
+[data-theme='light'] .glass-card {
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(0, 0, 0, 0.08);
 }

@@ -44,9 +44,12 @@ export default function Sidebar({ user, activeNav = 'dashboard', recentDocs = []
           <span>📚</span> Legal Library
         </div>
 
-
-
         <div 
+          className={`sidebar-link ${activeNav === 'chat' ? 'active' : ''}`}
+          onClick={() => onNavChange && onNavChange('chat')}
+        >
+          <span>💬</span> AI Chatbot
+        </div>        <div 
           className="sidebar-link" 
           onClick={() => setShowRecent(!showRecent)}
           style={{ justifyContent: 'space-between', marginTop: '0.5rem' }}

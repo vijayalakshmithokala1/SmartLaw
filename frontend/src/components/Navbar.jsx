@@ -1,7 +1,7 @@
 import React from 'react';
 import Dropdown from './Dropdown';
 
-export default function Navbar({ user, onLogout, onMenuClick }) {
+export default function Navbar({ user, onLogout, onMenuClick, theme, toggleTheme }) {
   return (
     <nav className="navbar" style={{ padding: '0 2rem', background: 'transparent', borderBottom: 'none' }}>
       {onMenuClick && (
@@ -17,7 +17,16 @@ export default function Navbar({ user, onLogout, onMenuClick }) {
 
       {/* Right — User info + Dropdowns */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
-        
+        {/* Theme Toggle */}
+        <button 
+          className="btn-ghost" 
+          onClick={toggleTheme}
+          style={{ padding: '0.4rem 0.8rem', display: 'flex', alignItems: 'center', gap: '0.5rem', borderRadius: '40px' }}
+          title="Toggle Light/Dark Mode"
+        >
+          {theme === 'dark' ? '☀️ Light' : '🌙 Dark'}
+        </button>
+
         {/* Help & Support Helplines Dropdown */}
         <Dropdown align="left" trigger={
           <button className="btn-ghost" style={{ padding: '0.4rem 0.8rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
