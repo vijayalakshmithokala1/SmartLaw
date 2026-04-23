@@ -86,7 +86,7 @@ export default function Dashboard({ user, onLogout, theme, toggleTheme, apiBase 
                   fetch(`${apiBase}/document/chat`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${user.token}` },
-                    body: JSON.stringify({ message: t.prompt, history: [] })
+                    body: JSON.stringify({ query: t.prompt, history: [] })
                   })
                   .then(res => res.json())
                   .then(draftData => {
@@ -115,7 +115,7 @@ export default function Dashboard({ user, onLogout, theme, toggleTheme, apiBase 
     if (activeNav === 'chat') {
       return (
         <iframe 
-          src="http://localhost:5173/chat-embed" 
+          src="/chat-embed" 
           style={{ width: '100%', height: '100%', border: 'none', borderRadius: 'var(--radius-md)' }} 
           title="AI Legal Assistant"
         />
