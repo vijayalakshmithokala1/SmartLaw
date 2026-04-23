@@ -12,14 +12,20 @@ export default function DocUploader({
   token, apiBase, onSummaryReady, 
   step, setStep, 
   result, setResult, 
-  error, setError 
+  error, setError,
+  initialTab = 'summary'
 }) {
+  const [activeResultTab, setActiveResultTab] = useState(initialTab);
   const [dragOver, setDragOver] = useState(false);
   const [showPii, setShowPii] = useState(false);
   const [showEntitiesModal, setShowEntitiesModal] = useState(false);
   const fileRef = useRef();
 
-  const reset = () => { setResult(null); setError(''); setStep(-1); setShowPii(false); };
+  const reset = () => { setResult(null); setError(''); setStep(-1); setShowPii(false); setActiveResultTab(initialTab); };
+
+  React.useEffect(() => {
+    if (result) setActiveResultTab(initialTab);
+  }, [initialTab, result]);
 
   const processFile = async (file) => {
     if (!file) return;
@@ -195,10 +201,10 @@ export default function DocUploader({
 
       {/* Result */}
       {result && step === 3 && (
-        <div className="fade-up" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+        <div className="fade-up" style={{ display: 'flex', flexDirection: 'column', gap: '1rem', flex: 1, minHeight: 0 }}>
 
           {/* Header row */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.75rem', borderBottom: '1px solid var(--border)', paddingBottom: '1rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.75rem', borderBottom: '1px solid var(--border)', paddingBottom: '0.75rem' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
               <div style={{ width: 40, height: 40, borderRadius: '8px', background: 'var(--gold-dim)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.25rem' }}>📄</div>
               <div>
@@ -211,8 +217,8 @@ export default function DocUploader({
               </div>
             </div>
             <div style={{ display: 'flex', gap: '0.5rem' }}>
-              <button className="btn-ghost" onClick={() => window.print()} style={{ padding: '0.5rem 1rem', fontSize: '0.85rem' }}>
-                📥 Export Report
+              <button className="btn-ghost" onClick={() => setActiveResultTab('document')} style={{ padding: '0.5rem 1rem', fontSize: '0.85rem' }}>
+                📄 View Document
               </button>
               <button className="btn-gold" onClick={reset} style={{ padding: '0.5rem 1.25rem', fontSize: '0.85rem' }}>
                 Analyze New
@@ -220,29 +226,78 @@ export default function DocUploader({
             </div>
           </div>
 
-          <div className="result-grid">
+          <div className="result-container">
             
-            {/* MAIN AREA */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', minWidth: 0 }}>
-              
-              {/* Summary Card */}
-              <div className="glass-card" style={{ padding: '1.75rem' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '1.25rem' }}>
-                  <span style={{ fontSize: '1.2rem' }}>📝</span>
-                  <h3 style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--gold-light)', margin: 0 }}>
-                    Executive Summary
-                  </h3>
-                  <span className="badge badge-blue" style={{ marginLeft: 'auto' }}>AI Simplified</span>
+            {/* MINI SIDEBAR */}
+            <div className="result-mini-sidebar">
+              {[
+                { id: 'summary', icon: '📝', label: 'Summary' },
+                { id: 'document', icon: '📜', label: 'Document View' },
+                { id: 'risk', icon: '⚖️', label: 'Risk Analyzer' },
+                { id: 'deadlines', icon: '📅', label: 'Obligations' },
+                { id: 'negotiate', icon: '🤝', label: 'Negotiate' },
+                { id: 'todo', icon: '📋', label: 'To-Do List' },
+                { id: 'draft', icon: '✍️', label: 'Drafting' },
+                { id: 'translate', icon: '🌐', label: 'Translate' },
+                { id: 'simulator', icon: '🧪', label: 'Simulator' },
+                { id: 'metadata', icon: '📁', label: 'Metadata' }
+              ].map(item => (
+                <div 
+                  key={item.id} 
+                  className={`result-sidebar-item ${activeResultTab === item.id ? 'active' : ''}`}
+                  onClick={() => setActiveResultTab(item.id)}
+                  title={item.label}
+                >
+                  {item.icon}
                 </div>
-                
-                <div className="summary-content" style={{ whiteSpace: 'pre-wrap', color: 'var(--text-primary)', fontSize: '0.95rem' }}>
-                  {showPii && result.token_map 
-                    ? Object.entries(result.token_map).reduce((t, [token, val]) => t.replaceAll(token, val), result.summary) 
-                    : result.summary}
-                </div>
-              </div>
+              ))}
+            </div>
 
-              {/* Quick Actions moved inside main area */}
+            {/* MAIN CONTENT AREA */}
+            <div className="result-content-area">
+              
+              {/* Summary Tab */}
+              {activeResultTab === 'summary' && (
+                <div className="glass-card fade-up" style={{ padding: '1.75rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '1.25rem' }}>
+                    <span style={{ fontSize: '1.2rem' }}>📝</span>
+                    <h3 style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--gold-light)', margin: 0 }}>
+                      Executive Summary
+                    </h3>
+                    <span className="badge badge-blue" style={{ marginLeft: 'auto' }}>AI Simplified</span>
+                  </div>
+                  
+                  <div className="summary-content" style={{ whiteSpace: 'pre-wrap', color: 'var(--text-primary)', fontSize: '0.95rem' }}>
+                    {showPii && result.token_map 
+                      ? Object.entries(result.token_map).reduce((t, [token, val]) => t.replaceAll(token, val), result.summary) 
+                      : result.summary}
+                  </div>
+                </div>
+              )}
+
+              {/* Document View Tab */}
+              {activeResultTab === 'document' && (
+                <div className="fade-up" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                   <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                      <button className="btn-gold" onClick={() => window.print()} style={{ padding: '0.5rem 1rem' }}>
+                         📥 Download Official PDF
+                      </button>
+                   </div>
+                   <div className="legal-paper">
+                      <div className="legal-paper-header">
+                         <h1>SmartLaw Official Draft</h1>
+                         <p style={{ margin: 0, fontSize: '0.8rem', color: '#666' }}>ID: {result.filename?.toUpperCase()}</p>
+                      </div>
+                      <div className="legal-paper-content">
+                         {showPii && result.token_map 
+                           ? Object.entries(result.token_map).reduce((t, [token, val]) => t.replaceAll(token, val), result.summary) 
+                           : result.summary}
+                      </div>
+                   </div>
+                </div>
+              )}
+
+              {/* Other Tool Tabs — Handled by QuickActions */}
               <QuickActions 
                  token={token} 
                  apiBase={apiBase} 
@@ -250,107 +305,10 @@ export default function DocUploader({
                  summaryText={result.summary}
                  tokenMap={result.token_map}
                  showPii={showPii}
+                 activeTab={activeResultTab}
+                 result={result}
+                 setShowEntitiesModal={setShowEntitiesModal}
               />
-            </div>
-
-            {/* MINI SIDEBAR */}
-            <div className="sidebar-sticky" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', position: 'sticky', top: '80px' }}>
-              
-              {/* Risk Score Card */}
-              <div className="glass-card" style={{ padding: '1.25rem', border: '1px solid var(--gold-border)' }}>
-                <p style={{ margin: '0 0 1rem 0', fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                  ⚖️ Risk Assessment
-                </p>
-                
-                {(() => {
-                    const level = result?.risk_level?.toUpperCase() || 'LOW';
-                    const colors = {
-                      LOW: { bg: 'rgba(16, 185, 129, 0.1)', text: '#10B981', border: 'rgba(16, 185, 129, 0.2)' },
-                      MEDIUM: { bg: 'rgba(245, 158, 11, 0.1)', text: '#F59E0B', border: 'rgba(245, 158, 11, 0.2)' },
-                      HIGH: { bg: 'rgba(239, 68, 68, 0.1)', text: '#EF4444', border: 'rgba(239, 68, 68, 0.2)' },
-                      CRITICAL: { bg: 'rgba(220, 38,  red, 0.2)', text: '#EF4444', border: 'rgba(220, 38, 38, 0.4)' }
-                    };
-                    const style = colors[level] || colors.LOW;
-                    return (
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                        <div style={{ textAlign: 'center', padding: '1.5rem', borderRadius: '12px', background: style.bg, border: `1px solid ${style.border}` }}>
-                           <p style={{ margin: 0, fontSize: '0.75rem', fontWeight: 600, color: style.text }}>VERDICT</p>
-                           <h2 style={{ margin: '0.25rem 0', fontSize: '1.75rem', fontWeight: 900, color: style.text }}>{level}</h2>
-                        </div>
-                        
-                        {result.risk_score && result.risk_score !== "N/A" && (
-                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.75rem', borderRadius: '8px', background: 'rgba(0,0,0,0.03)', border: '1px solid var(--border)' }}>
-                            <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Aggregated Score</span>
-                            <span style={{ fontWeight: 800, fontSize: '1.1rem', color: 'var(--text-primary)' }}>
-                                {(() => {
-                                  let s = result.risk_score.toString();
-                                  if (s.includes('/10')) return s;
-                                  return s + '/10';
-                                })()}
-                            </span>
-                          </div>
-                        )}
-                      </div>
-                    );
-                })()}
-              </div>
-
-              {/* Privacy/PII Card */}
-              <div className="glass-card" style={{ padding: '1.25rem' }}>
-                <p style={{ margin: '0 0 1rem 0', fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                  🔒 Privacy Guard
-                </p>
-                
-                {result.pii_found ? (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                    <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
-                      We found and redacted <strong>{Object.values(result.redaction_stats || {}).reduce((a,b)=>a+b, 0)}</strong> sensitive identifiers from this document.
-                    </div>
-                    <div style={{ display: 'flex', gap: '0.5rem' }}>
-                      <button 
-                          className="btn-ghost" 
-                          style={{ flex: 1, padding: '0.5rem', fontSize: '0.75rem' }}
-                          onClick={() => setShowEntitiesModal(true)}
-                      >
-                          🔬 Audit
-                      </button>
-                      <button 
-                          className="btn-ghost" 
-                          style={{ flex: 1, padding: '0.5rem', fontSize: '0.75rem', background: showPii ? 'var(--gold-dim)' : 'transparent' }}
-                          onClick={() => setShowPii(!showPii)}
-                      >
-                          {showPii ? '🔒 Hide' : '👁️ Reveal'}
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  <div style={{ fontSize: '0.85rem', color: '#10B981' }}>
-                    ✅ No sensitive PII detected.
-                  </div>
-                )}
-              </div>
-
-              {/* Doc Metadata Card */}
-              <div className="glass-card" style={{ padding: '1.25rem', background: 'rgba(0,0,0,0.02)' }}>
-                <p style={{ margin: '0 0 0.75rem 0', fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>
-                  📁 Metadata
-                </p>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', fontSize: '0.8rem' }}>
-                   <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                     <span style={{ color: 'var(--text-muted)' }}>Format</span>
-                     <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>{result.filename.split('.').pop().toUpperCase()}</span>
-                   </div>
-                   <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                     <span style={{ color: 'var(--text-muted)' }}>Characters</span>
-                     <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>{result.char_count}</span>
-                   </div>
-                   <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                     <span style={{ color: 'var(--text-muted)' }}>Language</span>
-                     <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>English</span>
-                   </div>
-                </div>
-              </div>
-
             </div>
           </div>
 
