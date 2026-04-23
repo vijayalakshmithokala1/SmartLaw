@@ -68,11 +68,31 @@ export default function Dashboard({ user, onLogout, theme, toggleTheme, apiBase 
   const renderContent = () => {
     if (activeNav === 'library') {
       const templates = [
-        { name: "Non-Disclosure Agreement (NDA)", desc: "Confidentiality terms for business discussions.", prompt: "Generate a professional Non-Disclosure Agreement (NDA) between two parties including non-solicitation and data protection clauses." },
-        { name: "Service Agreement", desc: "Terms for freelance or consulting services.", prompt: "Draft a Service Agreement for a consultant providing technical services, including payment terms, IP ownership, and termination clauses." },
-        { name: "Rental/Lease Agreement", desc: "For residential or commercial properties.", prompt: "Create a residential rental agreement including security deposit, maintenance responsibilities, and notice period." },
-        { name: "Employment Contract", desc: "Standard terms for hiring employees.", prompt: "Draft an employment contract including roles, salary, confidentiality, and non-compete clauses." },
-        { name: "Legal Notice for Recovery", desc: "Demand letter for unpaid dues.", prompt: "Draft a formal legal notice for recovery of unpaid dues from a client, including a 15-day notice period." }
+        { 
+          name: "Non-Disclosure Agreement (NDA)", 
+          desc: "Confidentiality terms for business discussions.", 
+          prompt: "Draft a comprehensive, formal Non-Disclosure Agreement (NDA). Include a professional preamble, clear definitions of confidential information, non-solicitation clauses, data protection (IT Act 2000 compliance), term/termination details, and a signatures section. Use formal legal language and [PLACEHOLDER] tags for parties and dates." 
+        },
+        { 
+          name: "Service Agreement", 
+          desc: "Terms for freelance or consulting services.", 
+          prompt: "Draft a professional Service Agreement for an independent contractor. Include scope of work, payment milestones, intellectual property (IP) assignment, liability limits, termination for convenience/cause, and formal signature blocks. Use legally rigorous phrasing." 
+        },
+        { 
+          name: "Rental/Lease Agreement", 
+          desc: "For residential or commercial properties.", 
+          prompt: "Create a formal Residential Lease Agreement under Indian law. Include clauses for security deposits, maintenance responsibilities, lock-in periods, notice for eviction, and jurisdictional courts. Use professional legal formatting with numbered clauses." 
+        },
+        { 
+          name: "Employment Contract", 
+          desc: "Standard terms for hiring employees.", 
+          prompt: "Draft a formal Employment Offer Letter and Contract. Include job role definitions, remuneration details, probation periods, confidentiality/NDA clauses, and non-compete terms. Ensure it follows standard Indian corporate legal practices." 
+        },
+        { 
+          name: "Legal Notice for Recovery", 
+          desc: "Demand letter for unpaid dues.", 
+          prompt: "Draft a formal and stern Legal Notice for recovery of unpaid dues. Include references to relevant sections for breach of contract, a clear demand for payment with a 15-day deadline, and notice of intended legal proceedings. Use a formal lawyer-like tone." 
+        }
       ];
       return (
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflowY: 'auto', padding: '1rem' }}>
