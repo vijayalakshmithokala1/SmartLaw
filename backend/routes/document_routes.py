@@ -12,9 +12,9 @@ from routes.auth_routes import require_auth
 from services.extraction_service import extract_text, is_allowed
 from services.pii_service import redact_pii, get_redaction_summary
 from services.ai_service import (
-    summarize_document, legal_chat, translate_text, 
     generate_action_items, draft_letter, find_lawyer_advice,
-    analyze_risk, extract_deadlines, negotiate_clause, simulate_what_if
+    analyze_risk, extract_deadlines, negotiate_clause, simulate_what_if,
+    draft_legal_document
 )
 
 document_bp = Blueprint("document", __name__)
@@ -168,6 +168,29 @@ def chat():
         if "rate limit" in error_msg.lower():
             return jsonify({"error": "AI service is busy. Please try again in a moment."}), 429
         return jsonify({"error": f"Could not get a response: {error_msg}"}), 500
+
+
+@document_bp.route("/draft", methods=["POST"])
+@require_auth
+def draft_document():
+    """
+    Dedicated legal drafting endpoint for templates.
+    """
+    if _is_rate_limited(g.current_user.id):
+        return jsonify({"error": "Please wait a moment."}), 429
+
+    data = request.get_json() or {}
+    prompt = data.get("query", "").strip()
+
+    if not prompt:
+        return jsonify({"error": "Please provide drafting instructions."}), 400
+
+    try:
+        draft = draft_legal_document(prompt)
+        return jsonify({"answer": draft})
+
+    except Exception as e:
+        return jsonify({"error": f"Drafting failed: {str(e)}"}), 500
 
 
 # ──────────────────────────────────────────────

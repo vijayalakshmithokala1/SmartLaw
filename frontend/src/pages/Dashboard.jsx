@@ -103,7 +103,7 @@ export default function Dashboard({ user, onLogout, theme, toggleTheme, apiBase 
                 <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '1.25rem' }}>{t.desc}</p>
                 <button className="btn-gold" style={{ width: '100%' }} disabled={isProcessing} onClick={() => {
                   setIsProcessing(true);
-                  fetch(`${apiBase}/document/chat`, {
+                  fetch(`${apiBase}/document/draft`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${user.token}` },
                     body: JSON.stringify({ query: t.prompt, history: [] })

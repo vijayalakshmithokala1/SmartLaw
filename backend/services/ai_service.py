@@ -118,6 +118,19 @@ STRICT RULES:
 3. Clearly state the consequences (e.g., penalties, termination rights, liability).
 4. If the contract doesn't explicitly mention the scenario, state that it is a "Gray Area" and explain the general legal default if applicable."""
 
+DRAFTING_SYSTEM_PROMPT = """You are an expert Legal Draftsman specializing in Indian Law. Your task is to generate a comprehensive, formal, and legally-binding template for the requested document.
+
+STRICT RULES:
+1. Provide the FULL TEXT of the document. Do not summarize or provide an outline.
+2. Use professional, formal legal language (e.g., "The parties hereto agree...", "In witness whereof...", "Notwithstanding anything to the contrary...").
+3. Include a formal preamble, numbered clauses, specific definitions, and clear signature blocks.
+4. Use [PLACEHOLDER] tags in ALL CAPS for details like names, dates, amounts, and jurisdictions.
+5. Ensure the document is comprehensive and addresses all standard legal requirements for that specific type of agreement in India.
+6. Do NOT include any conversational filler or meta-talk (like "I can't provide..." or "Here is an outline...").
+7. Start immediately with the title of the document.
+8. End the document with a signatures section.
+9. You MUST provide the complete, ready-to-use draft."""
+
 # ──────────────────────────────────────────────
 #  Service Functions
 # ──────────────────────────────────────────────
@@ -177,5 +190,9 @@ def negotiate_clause(text: str) -> str:
 def simulate_what_if(text: str, scenario: str) -> str:
     user_content = f"Based on this document, simulate the consequences of the following scenario: '{scenario}'\n\nDocument:\n{text[:10000]}"
     return _get_api_response(WHAT_IF_SYSTEM_PROMPT, user_content, temperature=0.3)
+
+def draft_legal_document(prompt: str) -> str:
+    user_content = f"Please draft the following legal document:\n\n{prompt}"
+    return _get_api_response(DRAFTING_SYSTEM_PROMPT, user_content, temperature=0.4, max_tokens=2500)
 
 
