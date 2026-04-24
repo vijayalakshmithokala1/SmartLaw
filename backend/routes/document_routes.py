@@ -11,12 +11,7 @@ from flask import Blueprint, request, jsonify, g
 from routes.auth_routes import require_auth
 from services.extraction_service import extract_text, is_allowed
 from services.pii_service import redact_pii, get_redaction_summary
-from services.ai_service import (
-    summarize_document, legal_chat, translate_text,
-    generate_action_items, draft_letter, find_lawyer_advice,
-    analyze_risk, extract_deadlines, negotiate_clause, simulate_what_if,
-    draft_legal_document
-)
+from services import ai_service
 
 document_bp = Blueprint("document", __name__)
 
@@ -92,7 +87,7 @@ def upload_and_summarize():
         secure_url = StorageService.upload_file(file_bytes, file.filename)
 
         # Step 6: AI Summary (using anonymized text)
-        full_res = summarize_document(redacted_text)
+        full_res = ai_service.summarize_document(redacted_text)
         
         # Extract risk level from the first line (e.g., "RISK: [MEDIUM]")
         risk_level = "LOW"
@@ -161,7 +156,7 @@ def chat():
         return jsonify({"error": "Question is too long. Please keep it under 2000 characters."}), 400
 
     try:
-        answer = legal_chat(query, document_context=redacted_context)
+        answer = ai_service.legal_chat(query, document_context=redacted_context)
         return jsonify({"answer": answer})
 
     except Exception as e:
@@ -187,7 +182,7 @@ def draft_document():
         return jsonify({"error": "Please provide drafting instructions."}), 400
 
     try:
-        draft = draft_legal_document(prompt)
+        draft = ai_service.draft_legal_document(prompt)
         return jsonify({"answer": draft})
 
     except Exception as e:
@@ -216,7 +211,7 @@ def analyze_direct_text():
 
     try:
         # Step 1: Analyze via AI
-        full_res = summarize_document(text)
+        full_res = ai_service.summarize_document(text)
         
         # Extract risk level
         risk_level = "LOW"
@@ -261,7 +256,7 @@ def translate_action():
     if not text: return jsonify({"error": "No text provided."}), 400
     try:
         if _is_rate_limited(g.current_user.id): return jsonify({"error": "Rate limited."}), 429
-        return jsonify({"result": translate_text(text, language)})
+        return jsonify({"result": ai_service.translate_text(text, language)})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
@@ -273,7 +268,7 @@ def action_items_action():
     if not text: return jsonify({"error": "No context provided."}), 400
     try:
         if _is_rate_limited(g.current_user.id): return jsonify({"error": "Rate limited."}), 429
-        return jsonify({"result": generate_action_items(text)})
+        return jsonify({"result": ai_service.generate_action_items(text)})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
@@ -286,7 +281,7 @@ def draft_letter_action():
     if not text: return jsonify({"error": "No context provided."}), 400
     try:
         if _is_rate_limited(g.current_user.id): return jsonify({"error": "Rate limited."}), 429
-        return jsonify({"result": draft_letter(text, intent)})
+        return jsonify({"result": ai_service.draft_letter(text, intent)})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
@@ -298,7 +293,7 @@ def lawyer_advice_action():
     if not text: return jsonify({"error": "No context provided."}), 400
     try:
         if _is_rate_limited(g.current_user.id): return jsonify({"error": "Rate limited."}), 429
-        return jsonify({"result": find_lawyer_advice(text)})
+        return jsonify({"result": ai_service.find_lawyer_advice(text)})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
@@ -310,7 +305,7 @@ def analyze_risk_action():
     if not text: return jsonify({"error": "No context provided."}), 400
     try:
         if _is_rate_limited(g.current_user.id): return jsonify({"error": "Rate limited."}), 429
-        return jsonify({"result": analyze_risk(text)})
+        return jsonify({"result": ai_service.analyze_risk(text)})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
@@ -322,7 +317,7 @@ def extract_deadlines_action():
     if not text: return jsonify({"error": "No context provided."}), 400
     try:
         if _is_rate_limited(g.current_user.id): return jsonify({"error": "Rate limited."}), 429
-        return jsonify({"result": extract_deadlines(text)})
+        return jsonify({"result": ai_service.extract_deadlines(text)})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
@@ -334,7 +329,7 @@ def negotiate_action():
     if not text: return jsonify({"error": "No context provided."}), 400
     try:
         if _is_rate_limited(g.current_user.id): return jsonify({"error": "Rate limited."}), 429
-        return jsonify({"result": negotiate_clause(text)})
+        return jsonify({"result": ai_service.negotiate_clause(text)})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
@@ -347,7 +342,7 @@ def what_if_action():
     if not text or not scenario: return jsonify({"error": "Context and scenario required."}), 400
     try:
         if _is_rate_limited(g.current_user.id): return jsonify({"error": "Rate limited."}), 429
-        return jsonify({"result": simulate_what_if(text, scenario)})
+        return jsonify({"result": ai_service.simulate_what_if(text, scenario)})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
