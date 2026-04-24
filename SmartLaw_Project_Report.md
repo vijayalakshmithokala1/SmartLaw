@@ -140,22 +140,26 @@ Most existing tools do not focus on PII redaction as a core part of the inferenc
 - Real-time feedback during document processing.
 
 ### 3.4 Functional Requirements
-- **User Authentication**: Users must be able to securely register and log in using JWT-based authentication.
-- **Document Ingestion**: The system must support multi-format uploads including PDF, DOCX, and scanned images (JPG/PNG).
-- **OCR Extraction**: The platform must accurately extract text from scanned documents using Tesseract OCR.
-- **PII Redaction**: The system must automatically detect and mask Personally Identifiable Information (PAN, Aadhaar, etc.) before AI processing.
-- **Automated Summarization**: The AI must generate concise plain-English summaries of complex legal documents.
-- **Risk Audit**: The system must identify and flag risky clauses or unusual terms with page-level citations.
-- **AI Legal Chat**: Users must be able to ask context-specific questions about the document and receive reasoned answers.
-- **Contract Generation**: The system must draft legal notices or agreements based on simple user prompts.
+| Feature | Description |
+| --- | --- |
+| **User Authentication** | Secure registration and login using JWT-based authentication. |
+| **Document Ingestion** | Support for PDF, DOCX, and scanned images (JPG/PNG). |
+| **OCR Extraction** | Accurate text extraction from scanned docs using Tesseract OCR. |
+| **PII Redaction** | Automatic detection and masking of sensitive info (PAN, Aadhaar) before AI. |
+| **Automated Summarization** | Generation of plain-English summaries for complex legal clauses. |
+| **Risk Audit** | Identification of risky terms with exact page-level citations. |
+| **AI Legal Chat** | Context-aware Q&A interface for document-specific queries. |
+| **Contract Generation** | Drafting of legal notices or agreements from simple user prompts. |
 
 ### 3.5 Non-Functional Requirements
-- **Data Privacy**: Sensitive PII mapping must remain strictly in the browser UI and never be stored on the server or sent to the LLM.
-- **Security**: All communication must be encrypted via HTTPS, and data must be protected using stateless JWT tokens.
-- **Performance**: Document analysis (OCR + AI) should complete within 5–8 seconds for standard files.
-- **Scalability**: The backend must be containerized (Docker) to support horizontal scaling and consistent deployments.
-- **Usability**: The interface must be responsive and follow modern design principles (Glassmorphism) to ensure ease of use for legal professionals.
-- **Reliability**: The system should handle various document qualities and provide fallback mechanisms for failed OCR or AI requests.
+| Attribute | Description |
+| --- | --- |
+| **Data Privacy** | Sensitive PII mapping remains in browser UI; never stored on server. |
+| **Security** | HTTPS encryption and stateless JWT token protection. |
+| **Performance** | Analysis (OCR + AI) completes within 5–8 seconds. |
+| **Scalability** | Containerized backend (Docker) for consistent, scalable deployment. |
+| **Usability** | Responsive Glassmorphism UI for intuitive legal professional experience. |
+| **Reliability** | Fallback mechanisms for failed OCR or AI reasoning requests. |
 
 ---
 
