@@ -60,9 +60,11 @@ SmartLaw is a secure, privacy-first legal document management and analysis platf
    2.1 Existing Work
    2.2 Limitations of Existing Work
 3. **REQUIREMENT ANALYSIS**
-   3.1 Software requirements
-   3.2 Hardware requirements
-   3.3 User requirements
+   3.1 Software Requirements
+   3.2 Hardware Requirements
+   3.3 User Requirements
+   3.4 Functional Requirements
+   3.5 Non-Functional Requirements
 4. **SYSTEM DESIGN**
    4.0 Proposed System architecture
    4.1 Proposed Methods/ Algorithms
@@ -132,10 +134,28 @@ Most existing tools do not focus on PII redaction as a core part of the inferenc
 | **Network** | High-speed internet for API sync |
 | **Graphics** | Integrated Graphics (Intel UHD or equivalent) |
 
-### 3.3 User requirements
+### 3.3 User Requirements
 - Secure authentication (JWT).
 - Dashboard for document management.
 - Real-time feedback during document processing.
+
+### 3.4 Functional Requirements
+- **User Authentication**: Users must be able to securely register and log in using JWT-based authentication.
+- **Document Ingestion**: The system must support multi-format uploads including PDF, DOCX, and scanned images (JPG/PNG).
+- **OCR Extraction**: The platform must accurately extract text from scanned documents using Tesseract OCR.
+- **PII Redaction**: The system must automatically detect and mask Personally Identifiable Information (PAN, Aadhaar, etc.) before AI processing.
+- **Automated Summarization**: The AI must generate concise plain-English summaries of complex legal documents.
+- **Risk Audit**: The system must identify and flag risky clauses or unusual terms with page-level citations.
+- **AI Legal Chat**: Users must be able to ask context-specific questions about the document and receive reasoned answers.
+- **Contract Generation**: The system must draft legal notices or agreements based on simple user prompts.
+
+### 3.5 Non-Functional Requirements
+- **Data Privacy**: Sensitive PII mapping must remain strictly in the browser UI and never be stored on the server or sent to the LLM.
+- **Security**: All communication must be encrypted via HTTPS, and data must be protected using stateless JWT tokens.
+- **Performance**: Document analysis (OCR + AI) should complete within 5–8 seconds for standard files.
+- **Scalability**: The backend must be containerized (Docker) to support horizontal scaling and consistent deployments.
+- **Usability**: The interface must be responsive and follow modern design principles (Glassmorphism) to ensure ease of use for legal professionals.
+- **Reliability**: The system should handle various document qualities and provide fallback mechanisms for failed OCR or AI requests.
 
 ---
 
