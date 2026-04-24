@@ -67,10 +67,11 @@ SmartLaw is a secure, privacy-first legal document management and analysis platf
    3.5 Non-Functional Requirements
 4. **SYSTEM DESIGN**
    4.0 Proposed System Architecture
-   4.1 System Modules
-   4.2 Proposed Methods/ Algorithms
-   4.3 Class / Use Case / Activity/ Sequence Diagrams
-   4.4 Datasets and Technology Stack
+   4.1 System Flow Chart
+   4.2 System Modules
+   4.3 Proposed Methods/ Algorithms
+   4.4 Class / Use Case / Activity/ Sequence Diagrams
+   4.5 Datasets and Technology Stack
 5. **IMPLEMENTATION**
    5.1 Front page Screenshot
    5.2 Results and Discussions
@@ -169,20 +170,75 @@ Most existing tools do not focus on PII redaction as a core part of the inferenc
 ### 4.0 Proposed System Architecture
 The system uses a distributed architecture. The React frontend handles the UI and client-side PII restoration. The Flask backend processes documents via OCR, manages the PII redaction logic, and communicates with the Groq AI API.
 
-### 4.1 System Modules
+```mermaid
+graph TD
+    User((User Browser))
+    
+    subgraph "Frontend (Vercel)"
+        React[React Application]
+        PII_Restore[PII Restoration Engine]
+    end
+    
+    subgraph "Backend (Render/Docker)"
+        Flask[Flask API]
+        OCR[Tesseract OCR Service]
+        Redaction[PII Redaction Service]
+    end
+    
+    subgraph "External Services"
+        Groq[Groq AI API - Llama 3.3]
+        Cloudinary[Cloudinary Storage]
+    end
+    
+    DB[(PostgreSQL Database)]
+
+    User <--> React
+    React <--> Flask
+    Flask <--> OCR
+    Flask <--> Redaction
+    Flask <--> Groq
+    Flask <--> Cloudinary
+    Flask <--> DB
+    PII_Restore --- React
+```
+
+### 4.1 System Flow Chart
+The following diagram illustrates the end-to-end process of document analysis within SmartLaw, highlighting the privacy-first redaction pipeline.
+
+```mermaid
+sequenceDiagram
+    participant U as User (Browser)
+    participant F as Frontend (React)
+    participant B as Backend (Flask)
+    participant O as OCR (Tesseract)
+    participant A as AI (Groq)
+
+    U->>F: Upload Document
+    F->>B: Send File (Multipart)
+    B->>O: Extract Text
+    O-->>B: Raw Text
+    B->>B: Redact PII & Create Tokens
+    B->>A: Send Anonymized Text
+    A-->>B: Analysis Results (Risks, Summary)
+    B-->>F: Send Results + PII Map
+    F->>F: Restore PII in UI
+    F-->>U: Display Secured Analysis
+```
+
+### 4.2 System Modules
 1.  **User Authentication & Dashboard Module**: Manages secure user access via JWT and provides the central interface for document management and analysis history.
 2.  **Intelligent Ingestion & OCR Module**: Handles multi-format file uploads and leverages Tesseract OCR to convert scanned legal documents into machine-readable text.
 3.  **Privacy-Preserving Analysis Module**: Implements the "Anonymized Inference" pipeline to redact PII and coordinates with AI models for risk auditing and summarization.
 4.  **Interactive Legal AI Module**: Powers the context-aware legal chatbot and automated contract drafting features for real-time document interaction.
 
-### 4.2 Proposed Methods/ Algorithms (PII Redaction Flow)
+### 4.3 Proposed Methods/ Algorithms (PII Redaction Flow)
 1. **Extraction**: Tesseract OCR extracts text from PDF/Images.
 2. **Redaction**: Regex and NLP-based service identifies PAN, Aadhaar, Names, and Emails.
 3. **Mapping**: Real values are stored in a temporary map, replaced by tokens like `[PAN_1]`.
 4. **Inference**: Anonymized text is sent to the LLM.
 5. **Restoration**: The UI replaces tokens with real values from the client-side memory.
 
-### 4.3 Datasets and Technology stack
+### 4.5 Datasets and Technology Stack
 - **Technology Stack**: MERN-like stack but with Python/Flask backend and PostgreSQL.
 
 ---
