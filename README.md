@@ -1,4 +1,4 @@
-# 🏛️ SmartLaw: Production-Grade Legal AI Platform
+# 🏛️ SmartLaw: Legal Summarizer and AI ChatBot
 
 SmartLaw is a secure legal document management and analysis platform that detects risks and generates actionable insights. Designed from the ground up prioritizing privacy, it ensures sensitive personal data is not exposed to third-party AI models.
 
