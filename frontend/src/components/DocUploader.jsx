@@ -13,7 +13,8 @@ export default function DocUploader({
   step, setStep, 
   result, setResult, 
   error, setError,
-  initialTab = 'summary'
+  initialTab = 'summary',
+  onTabChange
 }) {
   const [activeResultTab, setActiveResultTab] = useState(initialTab);
   const [dragOver, setDragOver] = useState(false);
@@ -21,7 +22,7 @@ export default function DocUploader({
   const [showEntitiesModal, setShowEntitiesModal] = useState(false);
   const fileRef = useRef();
 
-  const reset = () => { setResult(null); setError(''); setStep(-1); setShowPii(false); setActiveResultTab(initialTab); };
+  const reset = () => { setResult(null); setError(''); setStep(-1); setShowPii(false); setActiveResultTab(initialTab); onTabChange?.(initialTab); };
 
   React.useEffect(() => {
     if (result) setActiveResultTab(initialTab);
@@ -245,7 +246,7 @@ export default function DocUploader({
                 <div 
                   key={item.id} 
                   className={`result-sidebar-item ${activeResultTab === item.id ? 'active' : ''}`}
-                  onClick={() => setActiveResultTab(item.id)}
+                  onClick={() => { setActiveResultTab(item.id); onTabChange?.(item.id); }}
                   title={item.label}
                 >
                   {item.icon}

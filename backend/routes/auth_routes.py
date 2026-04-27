@@ -98,8 +98,8 @@ def register():
     if User.query.filter_by(email=email).first():
         return jsonify({"error": "An account with this email already exists."}), 409
 
-    # Hash password
-    password_hash = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
+    # Hash password — rounds=10 balances security and speed (~300ms vs ~1.5s at rounds=12)
+    password_hash = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt(rounds=10)).decode("utf-8")
 
     user = User(name=name, email=email, password_hash=password_hash, is_verified=False)
     db.session.add(user)
@@ -248,8 +248,8 @@ def reset_password():
     if not user:
         return jsonify({"error": "User not found."}), 404
 
-    # Hash new password
-    password_hash = bcrypt.hashpw(new_password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
+    # Hash new password — rounds=10 balances security and speed (~300ms vs ~1.5s at rounds=12)
+    password_hash = bcrypt.hashpw(new_password.encode("utf-8"), bcrypt.gensalt(rounds=10)).decode("utf-8")
     
     user.password_hash = password_hash
     db.session.commit()

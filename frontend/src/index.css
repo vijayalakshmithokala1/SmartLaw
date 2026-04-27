@@ -769,6 +769,20 @@ code {
   font-size: 1.1rem;
 }
 
+/* ── Case Roadmap ────────────────────────────── */
+.roadmap-node-hover {
+  transition: background 0.2s, border-color 0.2s, transform 0.15s;
+}
+.roadmap-node-hover:hover {
+  background: rgba(255, 255, 255, 0.03) !important;
+  transform: translateX(2px);
+}
+
+@keyframes roadmap-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(201,168,76,0.3); }
+  50%       { box-shadow: 0 0 0 4px rgba(201,168,76,0); }
+}
+
 @media print {
   body * { visibility: hidden; }
   .legal-paper, .legal-paper * { visibility: visible; }

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
+import CaseRoadmap from './CaseRoadmap';
 
-export default function Sidebar({ user, activeNav = 'dashboard', recentDocs = [], isOpen = false, onClose, onLoadDoc, onNavChange }) {
+export default function Sidebar({ user, activeNav = 'dashboard', recentDocs = [], isOpen = false, onClose, onLoadDoc, onNavChange, roadmapProps }) {
   const [showRecent, setShowRecent] = useState(false);
 
   return (
@@ -81,6 +82,13 @@ export default function Sidebar({ user, activeNav = 'dashboard', recentDocs = []
         )}
 
       </nav>
+
+      {/* ── Case Roadmap ── */}
+      {activeNav === 'dashboard' && (
+        <div style={{ marginTop: '1rem', padding: '0.75rem', background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border)', borderRadius: 'var(--radius-md)' }}>
+          <CaseRoadmap {...(roadmapProps || {})} />
+        </div>
+      )}
 
       {/* Bottom Info */}
       <div style={{ marginTop: 'auto', paddingTop: '2rem' }}>

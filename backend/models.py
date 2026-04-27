@@ -1,3 +1,4 @@
+import hashlib
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 
@@ -33,17 +34,23 @@ class RevokedToken(db.Model):
     __tablename__ = 'revoked_tokens'
 
     id = db.Column(db.Integer, primary_key=True)
-    jti = db.Column(db.String(512), unique=True, nullable=False, index=True)  # raw token
+    jti = db.Column(db.String(64), unique=True, nullable=False, index=True)  # SHA-256 hash of token
     revoked_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    @staticmethod
+    def _hash(token: str) -> str:
+        """Store a compact 64-char SHA-256 digest instead of the full token."""
+        return hashlib.sha256(token.encode()).hexdigest()
 
     @classmethod
     def revoke(cls, token: str):
         """Blacklist a token on logout."""
-        if not cls.query.filter_by(jti=token).first():
-            db.session.add(cls(jti=token))
+        hashed = cls._hash(token)
+        if not cls.query.filter_by(jti=hashed).first():
+            db.session.add(cls(jti=hashed))
             db.session.commit()
 
     @classmethod
     def is_revoked(cls, token: str) -> bool:
         """Return True if the token has been explicitly revoked."""
-        return cls.query.filter_by(jti=token).first() is not None
+        return cls.query.filter_by(jti=cls._hash(token)).first() is not None

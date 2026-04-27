@@ -17,6 +17,8 @@ export default function Dashboard({ user, onLogout, theme, toggleTheme, apiBase 
   const [isProcessing, setIsProcessing] = useState(false);
   
   const [redactedDocContext, setRedactedDocContext] = useState('');
+  // Active result tab — shared with CaseRoadmap so it can highlight the current stage
+  const [activeResultTab, setActiveResultTab] = useState('summary');
 
   useEffect(() => {
     if (user?.token) {
@@ -64,6 +66,7 @@ export default function Dashboard({ user, onLogout, theme, toggleTheme, apiBase 
       ...result 
     }, ...prev]);
     setActiveNav('dashboard');
+    setActiveResultTab('summary');
   };
 
   const renderContent = () => {
@@ -154,7 +157,19 @@ export default function Dashboard({ user, onLogout, theme, toggleTheme, apiBase 
             </button>
         )}
         <div style={redactedDocContext ? { flex: 1, display: 'flex', flexDirection: 'column' } : { padding: '2rem 0', margin: 'auto', width: '100%' }}>
-          <DocUploader token={user?.token} apiBase={apiBase} onSummaryReady={handleDocumentReady} step={uploadStep} setStep={setUploadStep} result={docResult} setResult={setDocResult} error={uploadError} setError={setUploadError} initialTab={initialResultTab} />
+          <DocUploader 
+            token={user?.token} 
+            apiBase={apiBase} 
+            onSummaryReady={handleDocumentReady} 
+            step={uploadStep} 
+            setStep={setUploadStep} 
+            result={docResult} 
+            setResult={setDocResult} 
+            error={uploadError} 
+            setError={setUploadError} 
+            initialTab={initialResultTab}
+            onTabChange={setActiveResultTab}
+          />
         </div>
       </div>
     );
@@ -170,7 +185,17 @@ export default function Dashboard({ user, onLogout, theme, toggleTheme, apiBase 
         isOpen={isSidebarOpen}
         onClose={() => setIsSidebarOpen(false)}
         onLoadDoc={(doc) => { setActiveNav('dashboard'); loadRecentDoc(doc); setIsSidebarOpen(false); }} 
-        onNavChange={(nav) => { setActiveNav(nav); setIsSidebarOpen(false); }} 
+        onNavChange={(nav) => { setActiveNav(nav); setIsSidebarOpen(false); }}
+        roadmapProps={{
+          result: docResult,
+          uploadStep,
+          activeTab: activeResultTab,
+          onNavigate: (tabId) => {
+            setInitialResultTab(tabId);
+            setActiveResultTab(tabId);
+            setActiveNav('dashboard');
+          }
+        }}
       />
       <main style={{ flex: 1, display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden', background: 'var(--bg-base)' }}>
         <Navbar user={user} onLogout={onLogout} onMenuClick={() => setIsSidebarOpen(true)} theme={theme} toggleTheme={toggleTheme} />
