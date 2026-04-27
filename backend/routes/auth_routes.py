@@ -11,7 +11,7 @@ from datetime import datetime, timedelta, timezone
 from flask import Blueprint, request, jsonify, g, redirect
 from functools import wraps
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadTimeSignature
-from models import db, User
+from models import db, User, RevokedToken
 from services.email_service import send_verification_email, send_password_reset_email
 
 auth_bp = Blueprint("auth", __name__)
@@ -54,11 +54,15 @@ def require_auth(f):
             return jsonify({"error": "Authentication required"}), 401
         token = auth_header[7:]
         try:
+            # Check token blacklist (server-side revocation via AuthService.revokeToken)
+            if RevokedToken.is_revoked(token):
+                return jsonify({"error": "Session has been revoked. Please log in again."}), 401
             payload = decode_token(token)
             user = User.query.get(payload["user_id"])
             if not user:
                 return jsonify({"error": "User not found"}), 401
             g.current_user = user
+            g.current_token = token  # Store token for logout use
         except jwt.ExpiredSignatureError:
             return jsonify({"error": "Session expired. Please log in again."}), 401
         except jwt.InvalidTokenError:
@@ -172,6 +176,22 @@ def login():
 @require_auth
 def get_me():
     return jsonify({"user": g.current_user.to_dict()})
+
+
+@auth_bp.route("/logout", methods=["POST"])
+@require_auth
+def logout():
+    """
+    AuthService.revokeToken() — Blacklists the current JWT server-side.
+    Clears the session and ensures the token cannot be reused even if
+    it hasn't expired yet. This matches the sequence diagram (Fig. 6).
+    """
+    try:
+        RevokedToken.revoke(g.current_token)
+        return jsonify({"message": "Successfully logged out. Session cleared."}), 200
+    except Exception as e:
+        # Even if DB write fails, logout should succeed on the client side
+        return jsonify({"message": "Logged out.", "warning": str(e)}), 200
 
 
 @auth_bp.route("/forgot-password", methods=["POST"])

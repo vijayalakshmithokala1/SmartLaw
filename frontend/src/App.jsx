@@ -56,7 +56,23 @@ export default function App() {
     }
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    // AuthService.revokeToken() — revoke JWT server-side first (matches sequence diagram Fig. 6)
+    const stored = localStorage.getItem('smartlaw_user') || sessionStorage.getItem('smartlaw_user');
+    if (stored) {
+      try {
+        const { token } = JSON.parse(stored);
+        if (token) {
+          await fetch(`${BASE_URL}/auth/logout`, {
+            method: 'POST',
+            headers: { Authorization: `Bearer ${token}` }
+          });
+        }
+      } catch {
+        // Logout continues even if the server call fails
+      }
+    }
+    // clearSession() — purge all local session data
     setUser(null);
     localStorage.removeItem('smartlaw_user');
     sessionStorage.removeItem('smartlaw_user');
