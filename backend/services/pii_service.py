@@ -60,6 +60,33 @@ PII_PATTERNS = [
 # ──────────────────────────────────────────────
 _nlp = None
 
+# Words that are NEVER redacted even if spaCy tags them as entities.
+# Covers legal role labels, document terms, financial abbreviations, and
+# common words the model misclassifies in legal text.
+_BLOCKLIST = {
+    # Legal role labels
+    'client', 'clients', 'provider', 'service provider', 'the service provider',
+    'party', 'parties', 'first party', 'second party',
+    'employer', 'employee', 'contractor', 'subcontractor',
+    'tenant', 'landlord', 'lessor', 'lessee',
+    'buyer', 'seller', 'vendor', 'purchaser',
+    'licensor', 'licensee', 'agent', 'principal',
+    'guarantor', 'indemnifier', 'claimant', 'respondent',
+    'plaintiff', 'defendant', 'appellant', 'petitioner',
+    # Legal document section words
+    'amendment', 'rights', 'amendment rights',
+    'liability', 'waiver', 'liability waiver',
+    'terms', 'conditions', 'agreement', 'contract',
+    'clause', 'section', 'schedule', 'annexure', 'appendix',
+    'whereas', 'herein', 'hereof', 'thereof', 'hereby', 'hereinafter',
+    'heavily', 'recitals', 'preamble', 'definitions',
+    # Financial / tax abbreviations (1-3 char words)
+    'rs', 'inr', 'pan', 'gst', 'tds', 'emi', 'usd', 'eur',
+    # Context words that bleed into spaCy spans
+    'aadhaar', 'date', 'birth', 'date of birth', 'dob',
+    'registered address', 'address',
+}
+
 def _get_nlp():
     """Lazy-load spaCy model so import is fast."""
     global _nlp
@@ -72,6 +99,42 @@ def _get_nlp():
     return _nlp if _nlp else None
 
 
+def _is_valid_entity(text: str, label: str) -> bool:
+    """
+    Return True only if the entity is a genuine PII candidate.
+    Filters out legal boilerplate that spaCy misclassifies.
+    """
+    stripped = text.strip()
+    lower = stripped.lower()
+
+    # 1. Blocklist check
+    if lower in _BLOCKLIST:
+        return False
+
+    # 2. Single all-caps word is almost always an acronym or legal heading, not a name
+    if stripped.isupper() and len(stripped.split()) == 1:
+        return False
+
+    # 3. Very short strings (1 char) are noise
+    if len(stripped) <= 2:
+        return False
+
+    # 4. PERSON entities: must have at least 2 characters and not be a role word
+    if label == "PERSON":
+        # Reject if any word in the span is a known role label
+        words = {w.lower() for w in stripped.split()}
+        if words & _BLOCKLIST:
+            return False
+
+    # 5. ORG entities: skip single common words that aren't real companies
+    if label == "ORG":
+        if stripped.lower() in {'pan', 'rs', 'gst', 'tds', 'inr', 'terms',
+                                  'heavily', 'provider', 'client', 'the service provider'}:
+            return False
+
+    return True
+
+
 def _redact_ner(text: str, counter: dict, token_map: dict) -> str:
     """
     Use spaCy Named Entity Recognition to find and replace:
@@ -79,6 +142,7 @@ def _redact_ner(text: str, counter: dict, token_map: dict) -> str:
       ORG     -> [ORG_N]
       GPE/LOC -> [PLACE_N]
     Processes in reverse order to preserve character offsets.
+    Only genuine entities (passing blocklist + quality filters) are redacted.
     """
     nlp = _get_nlp()
     if not nlp:
@@ -96,6 +160,11 @@ def _redact_ner(text: str, counter: dict, token_map: dict) -> str:
             cat = "PLACE"
         else:
             continue
+
+        # Apply quality filters before accepting
+        if not _is_valid_entity(ent.text, ent.label_):
+            continue
+
         entities.append((ent.start_char, ent.end_char, ent.text, cat))
 
     # Replace from end to start so positions stay valid
@@ -105,6 +174,7 @@ def _redact_ner(text: str, counter: dict, token_map: dict) -> str:
         text = text[:start] + token + text[end:]
 
     return text
+
 
 
 def redact_pii(text: str) -> tuple[str, dict]:
