@@ -2,6 +2,7 @@
 PII Redaction Service
 Detects and tokenizes sensitive personal information before it reaches the AI.
 Handles Indian-specific PII formats: Aadhaar, PAN, phone numbers, etc.
+Two-pass pipeline: spaCy NER (names/orgs/places) + Regex (IDs/numbers).
 """
 import re
 
@@ -54,22 +55,78 @@ PII_PATTERNS = [
     ("PINCODE", r"\b[1-9][0-9]{5}\b"),
 ]
 
+# ──────────────────────────────────────────────
+#  spaCy NER — for names, orgs, places
+# ──────────────────────────────────────────────
+_nlp = None
+
+def _get_nlp():
+    """Lazy-load spaCy model so import is fast."""
+    global _nlp
+    if _nlp is None:
+        try:
+            import spacy
+            _nlp = spacy.load("en_core_web_sm")
+        except Exception:
+            _nlp = False   # Mark as unavailable so we don't retry every call
+    return _nlp if _nlp else None
+
+
+def _redact_ner(text: str, counter: dict, token_map: dict) -> str:
+    """
+    Use spaCy Named Entity Recognition to find and replace:
+      PERSON  -> [NAME_N]
+      ORG     -> [ORG_N]
+      GPE/LOC -> [PLACE_N]
+    Processes in reverse order to preserve character offsets.
+    """
+    nlp = _get_nlp()
+    if not nlp:
+        return text  # Fall back gracefully if spaCy not available
+
+    doc = nlp(text)
+
+    entities = []
+    for ent in doc.ents:
+        if ent.label_ == "PERSON":
+            cat = "NAME"
+        elif ent.label_ == "ORG":
+            cat = "ORG"
+        elif ent.label_ in ("GPE", "LOC"):
+            cat = "PLACE"
+        else:
+            continue
+        entities.append((ent.start_char, ent.end_char, ent.text, cat))
+
+    # Replace from end to start so positions stay valid
+    for start, end, original, cat in sorted(entities, key=lambda x: x[0], reverse=True):
+        token = _next_token(cat, counter)
+        token_map[token] = original
+        text = text[:start] + token + text[end:]
+
+    return text
+
 
 def redact_pii(text: str) -> tuple[str, dict]:
     """
-    Scan text and replace PII with anonymous tokens.
-    Returns (redacted_text, token_map) where token_map maps token → original value.
-    The token_map is sent back to the client (browser) only; server never stores it.
+    Two-pass redaction:
+      Pass 1 — spaCy NER  -> names, organisations, places
+      Pass 2 — Regex      -> Aadhaar, PAN, phone, email, DOB, etc.
+    Returns (redacted_text, token_map).
+    The token_map is sent to the client only; server never stores it.
     """
     counter: dict = {}
     token_map: dict = {}
 
+    # Pass 1: NER-based (names / orgs / places)
+    text = _redact_ner(text, counter, token_map)
+
+    # Pass 2: Regex-based (structured Indian PII)
     for category, pattern in PII_PATTERNS:
         def replace_match(m, cat=category, internal_cnt=counter):
             token = _next_token(cat, internal_cnt)
             token_map[token] = m.group(0)
             return token
-
         text = re.sub(pattern, replace_match, text)
 
     return text, token_map

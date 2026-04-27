@@ -27,7 +27,8 @@ WORKDIR /app
 # Copying requirements first and using --no-cache-dir for a clean, pinned install
 COPY backend/requirements.txt .
 RUN pip install --no-cache-dir --upgrade pip \
-    && pip install --no-cache-dir -r requirements.txt
+    && pip install --no-cache-dir -r requirements.txt \
+    && python -m spacy download en_core_web_sm
 
 # 6. Copy Backend Application Code
 # Since dockerContext is '.', we copy from 'backend/'
