@@ -22,7 +22,7 @@ SmartLaw is a privacy-first legal AI platform that analyzes documents, detects r
 
 ## 🧪 Quick Demo Guide
 1. **Register/Login** via the frontend app.
-2. **Upload a sample document** (For the best experience, [download our Sample NDA](./sample-docs/) or use any standard corporate contract PDF).
+2. **Upload a sample document** (For the best experience, [download our Sample Service Agreement](./Service Agreement) or use any standard corporate contract PDF).
 3. **Click "Analyze"** to process the document.
 4. **Try the features**:
    - **Risk Audit**: Check the clause-level issues.
